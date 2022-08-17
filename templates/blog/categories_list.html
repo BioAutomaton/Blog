@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Categories
+{% endblock %}
+{% block content %}
+    <h1>Categories</h1>
+    <div class="list-group">
+        {% for category in object_list %}
+            <a href="{% url 'category' category.pk %}"
+               class="list-group-item list-group-item-action flex-column align-items-start">
+                {{ category.name }}
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

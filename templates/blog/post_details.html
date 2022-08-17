@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ post.title }}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>{{ post.title }}</h1>
+        <br>
+        {{ post.body|safe }}
+        <br>
+        <p>By
+            <a href="{% url 'profile' post.author.pk %}">{{ post.author.username }}</a>- {{ post.post_date }}
+            {% if user.is_authenticated and user == post.author %}
+                - <a href="{% url 'edit_post' post.pk %}">Edit</a>
+                <a href="{% url 'delete_post' post.pk %}">Delete</a>
+            {% endif %}
+        </p>
+        <p><a href="{% url 'category' post.category.pk %}">Discover more in {{ post.category }} category</a></p>
+
+        <hr>
+        <br>
+    </div>
+    <div class="container">
+        <h2>Comments</h2>
+        <form method='POST'>
+            {% csrf_token %}
+            {{ comment_form }}
+            <p></p>
+            <p>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-primary me-1">Comment</button>
+            </div>
+            </p>
+        </form>
+    </div>
+
+
+    {% if not post.comments.all %}
+        No comments yet...
+    {% else %}
+        <div class="container">
+            <ul class="list-group">
+                {% for comment in comments %}
+                    <li class="list-group-item">{{ comment.author.username }} {{ comment.date_added }}
+                        {% if user.is_authenticated and user == comment.author %} - <a
+                                href="{% url 'delete_comment' comment.pk %}">Delete</a>
+                        {% endif %}
+                        <p>{{ comment.text }}</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <br>
+        {% if comments.has_other_pages %}
+            <div class="d-flex justify-content-center">
+                <nav aria-label="pagination">
+                    <ul class="pagination">
+                        {% if comments.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ comments.previous_page_number }}"
+                                   aria-label="Previous">
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+
+
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#">Page {{ comments.number }}
+                            of {{ comments.paginator.num_pages }}</a></li>
+
+                        {% if comments.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ comments.next_page_number }}" aria-label="Next">
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ comments.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a></li>
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    {% endif %}
+    <br>
+{% endblock %}
